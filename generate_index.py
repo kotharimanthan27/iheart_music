@@ -1,5 +1,6 @@
 import os
 import glob
+import re
 
 def generate_index():
     # Find all html and pdf reports, and logs
@@ -8,8 +9,12 @@ def generate_index():
     files.extend(glob.glob("AutomationReport_*.pdf"))
     files.extend(glob.glob("ExecutionLog_*.log"))
     
-    # Sort files so newest are generally grouped
-    files.sort(reverse=True)
+    def extract_timestamp(filename):
+        match = re.search(r'(\d{8}_\d{6})', filename)
+        return match.group(1) if match else ""
+        
+    # Sort files by timestamp newest first, then by filename
+    files.sort(key=lambda f: (extract_timestamp(f), f), reverse=True)
     
     # Generate the list items
     list_items = ""
